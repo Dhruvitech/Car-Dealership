@@ -1,8 +1,11 @@
 const express = require("express");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
-app.use(express.json()); // aExpress doesn't automatically parse JSON. so s Express converts the incoming JSON into a JavaScript object.
+app.use(express.json()); // Express JSON middleware
+
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.send("Car Dealership API is running...");
