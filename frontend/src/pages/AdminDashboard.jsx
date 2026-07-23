@@ -130,14 +130,19 @@ export default function AdminDashboard() {
     }
   };
 
+  const totalStock = vehicles.reduce((sum, v) => sum + (v.quantity || 0), 0);
+  const categoriesCount = new Set(vehicles.map((v) => v.category).filter(Boolean)).size;
+
   return (
-    <div className="space-y-8">
-      {/* Admin Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Admin Management Portal</h1>
-          <p className="text-sm text-slate-600 mt-1">
-            Create, update, delete, and restock dealership vehicles
+    <div className="space-y-6 w-full">
+      {/* Executive Hero Banner */}
+      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-8 sm:p-10 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-slate-800 relative overflow-hidden">
+        <div className="space-y-2 max-w-2xl relative z-10">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+            Admin Management <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">Portal</span>
+          </h1>
+          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+            Create, update, delete, and restock dealership vehicles with precision and ease.
           </p>
         </div>
 
@@ -145,13 +150,55 @@ export default function AdminDashboard() {
           type="button"
           onClick={handleOpenCreateForm}
           aria-label="Add new vehicle listing"
-          className="px-4.5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm rounded-xl transition shadow-md shadow-blue-600/10 flex items-center gap-2 self-start md:self-auto"
+          className="relative z-10 px-5 py-3 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-sm rounded-xl transition shadow-lg shadow-blue-600/30 flex items-center gap-2.5 hover:scale-[1.02]"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
           </svg>
           Add New Vehicle
         </button>
+      </div>
+
+      {/* Metrics Summary Cards Grid with Standard SVG Icons */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Products</p>
+            <p className="text-2xl font-black text-slate-900 mt-1">{vehicles.length}</p>
+            <p className="text-xs text-slate-400 mt-0.5">Different models</p>
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shadow-sm">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5 17h14M5 17a2 2 0 01-2-2V11l2.2-4.4A2 2 0 017 5.5h10a2 2 0 011.8 1.1L21 11v4a2 2 0 01-2 2M5 17a2 2 0 104 0 2 2 0 00-4 0zm10 0a2 2 0 104 0 2 2 0 00-4 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Stock</p>
+            <p className="text-2xl font-black text-slate-900 mt-1">{totalStock}</p>
+            <p className="text-xs text-slate-400 mt-0.5">Units available</p>
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shadow-sm">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Categories</p>
+            <p className="text-2xl font-black text-slate-900 mt-1">{categoriesCount}</p>
+            <p className="text-xs text-slate-400 mt-0.5">Vehicle types</p>
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 shadow-sm">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M7 7h.01M7 3h5a1 1 0 01.707.293l7 7a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-7-7A1 1 0 017 8V3z" />
+            </svg>
+          </div>
+        </div>
       </div>
 
       {/* Alert Notifications */}
@@ -171,7 +218,7 @@ export default function AdminDashboard() {
 
       {/* Form Modal / Container */}
       {isFormOpen && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xl space-y-6">
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xl space-y-6">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <h2 className="text-xl font-bold text-slate-900">
               {editingVehicle ? "Edit Vehicle Details" : "Create New Vehicle Listing"}
@@ -190,16 +237,16 @@ export default function AdminDashboard() {
 
       {/* Loading & Empty Table States */}
       {loading ? (
-        <div aria-live="polite" className="p-12 text-center text-slate-500 bg-white border border-slate-200 rounded-2xl shadow-sm">
+        <div aria-live="polite" className="p-12 text-center text-slate-500 bg-white border border-slate-200/90 rounded-2xl shadow-sm">
           Loading inventory management records...
         </div>
       ) : vehicles.length === 0 ? (
-        <div className="p-12 text-center text-slate-500 bg-white border border-slate-200 rounded-2xl shadow-sm">
+        <div className="p-12 text-center text-slate-500 bg-white border border-slate-200/90 rounded-2xl shadow-sm">
           No vehicle records found. Click "Add New Vehicle" to create one.
         </div>
       ) : (
         /* Inventory Management Table */
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse" aria-label="Vehicle Inventory Records">
               <thead>

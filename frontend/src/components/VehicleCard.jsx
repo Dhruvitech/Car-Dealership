@@ -1,9 +1,11 @@
 import { useState } from "react";
 import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
-export default function VehicleCard({ vehicle, onPurchaseSuccess }) {
+export default function VehicleCard({ vehicle, onPurchaseSuccess, showPurchase = true }) {
   if (!vehicle) return null;
 
+  const { isAdmin } = useAuth() || {};
   const { _id, id, make, model, category, price, color, images } = vehicle;
   const vehicleId = _id || id;
 
@@ -14,8 +16,11 @@ export default function VehicleCard({ vehicle, onPurchaseSuccess }) {
   const isOutOfStock = quantity <= 0;
   const imageUrl = images && images.length > 0 ? images[0] : null;
 
+  // Hide purchase button if user is an admin or if explicitly hidden
+  const canPurchase = showPurchase && !isAdmin;
+
   const handlePurchase = async () => {
-    if (isOutOfStock || loading) return;
+    if (isOutOfStock || loading || !canPurchase) return;
 
     setLoading(true);
     setError("");
@@ -40,12 +45,12 @@ export default function VehicleCard({ vehicle, onPurchaseSuccess }) {
   return (
     <article className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 group flex flex-col">
       {/* Image Container */}
-      <div className="h-48 bg-slate-100 relative flex items-center justify-center overflow-hidden border-b border-slate-100">
+      <div className="h-56 bg-white relative flex items-center justify-center overflow-hidden border-b border-slate-100">
         {imageUrl ? (
           <img
             src={imageUrl}
             alt={`${make} ${model}`}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           <div className="flex flex-col items-center justify-center text-slate-400 space-y-1.5 p-4 text-center">
@@ -70,11 +75,10 @@ export default function VehicleCard({ vehicle, onPurchaseSuccess }) {
         {/* Stock Badge */}
         <div className="absolute top-3 right-3">
           <span
-            className={`px-3 py-1 text-xs font-semibold rounded-full border shadow-sm ${
-              isOutOfStock
+            className={`px-3 py-1 text-xs font-semibold rounded-full border shadow-sm ${isOutOfStock
                 ? "bg-red-50 text-red-700 border-red-200"
                 : "bg-emerald-50 text-emerald-700 border-emerald-200"
-            }`}
+              }`}
           >
             {isOutOfStock ? "Out of Stock" : `${quantity} in stock`}
           </span>
@@ -117,15 +121,17 @@ export default function VehicleCard({ vehicle, onPurchaseSuccess }) {
             </span>
           </div>
 
-          <button
-            type="button"
-            onClick={handlePurchase}
-            disabled={isOutOfStock || loading}
-            aria-label={`Purchase ${make} ${model}`}
-            className="px-4.5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm rounded-xl shadow-md shadow-blue-600/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
-          >
-            {loading ? "Purchasing..." : "Purchase"}
-          </button>
+          {canPurchase && (
+            <button
+              type="button"
+              onClick={handlePurchase}
+              disabled={isOutOfStock || loading}
+              aria-label={`Purchase ${make} ${model}`}
+              className="px-4.5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm rounded-xl shadow-md shadow-blue-600/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+            >
+              {loading ? "Purchasing..." : "Purchase"}
+            </button>
+          )}
         </div>
       </div>
     </article>

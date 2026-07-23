@@ -153,7 +153,7 @@ export default function VehicleForm({ initialData = null, onSubmit, onCancel, lo
 
         <div>
           <label htmlFor="price" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-            Price ($) <span className="text-red-500">*</span>
+            Price (₹) <span className="text-red-500">*</span>
           </label>
           <input
             id="price"
