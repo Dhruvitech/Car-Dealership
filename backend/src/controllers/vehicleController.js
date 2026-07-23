@@ -55,3 +55,13 @@ exports.deleteVehicle = async (req, res) => {
     return handleError(res, error);
   }
 };
+
+exports.searchVehicles = async (req, res) => {
+  try {
+    const vehicles = await vehicleService.searchVehicles(req.query);
+    return res.status(200).json({ vehicles });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
