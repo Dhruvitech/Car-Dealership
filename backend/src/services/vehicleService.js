@@ -139,6 +139,21 @@ class VehicleService {
 
     return vehicle;
   }
+  /**
+   * Restocks a vehicle by increasing its quantity.
+   */
+  async restockVehicle(id, amount) {
+    if (!amount || typeof amount !== "number" || amount <= 0) {
+      throwError("Restock quantity must be a positive number", 400);
+    }
+
+    const vehicle = await findVehicleOrFail(id);
+
+    vehicle.quantity += amount;
+    await vehicle.save();
+
+    return vehicle;
+  }
 }
 
 module.exports = new VehicleService();

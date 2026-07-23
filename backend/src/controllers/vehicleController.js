@@ -77,4 +77,17 @@ exports.purchaseVehicle = async (req, res) => {
   }
 };
 
+exports.restockVehicle = async (req, res) => {
+  try {
+    const vehicle = await vehicleService.restockVehicle(req.params.id, req.body.quantity);
+    return res.status(200).json({
+      message: "Vehicle restocked successfully",
+      vehicle
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
+
 
