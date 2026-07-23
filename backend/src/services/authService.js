@@ -47,6 +47,50 @@ class AuthService {
 
     return userObject;
   }
+
+  async loginUser({ email, password }) {
+    // 1. Validate required fields
+    if (!email) {
+      const error = new Error("Email is required");
+      error.statusCode = 400;
+      throw error;
+    }
+    if (!password) {
+      const error = new Error("Password is required");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    // 2. Verify email — find user in DB
+    const user = await User.findOne({ email });
+    if (!user) {
+      const error = new Error("Invalid email or password");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    // 3. Compare password using bcrypt
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      const error = new Error("Invalid email or password");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    // 4. Generate JWT
+    const secret = process.env.JWT_SECRET || "mySuperSecretKey123";
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      secret,
+      { expiresIn: "1d" }
+    );
+
+    // 5. Sanitize user — remove password before returning
+    const userObject = user.toObject ? user.toObject() : { ...user };
+    delete userObject.password;
+
+    return { token, user: userObject };
+  }
 }
 
 module.exports = new AuthService();
