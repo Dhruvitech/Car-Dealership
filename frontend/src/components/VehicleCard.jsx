@@ -1,9 +1,41 @@
-export default function VehicleCard({ vehicle }) {
+import { useState } from "react";
+import api from "../api/axios";
+
+export default function VehicleCard({ vehicle, onPurchaseSuccess }) {
   if (!vehicle) return null;
 
-  const { make, model, category, price, quantity, color, images } = vehicle;
+  const { _id, id, make, model, category, price, color, images } = vehicle;
+  const vehicleId = _id || id;
+
+  const [quantity, setQuantity] = useState(vehicle.quantity ?? 0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const isOutOfStock = quantity <= 0;
   const imageUrl = images && images.length > 0 ? images[0] : null;
+
+  const handlePurchase = async () => {
+    if (isOutOfStock || loading) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await api.post(`/vehicles/${vehicleId}/purchase`);
+      const updatedVehicle = response.data?.vehicle;
+
+      if (updatedVehicle) {
+        setQuantity(updatedVehicle.quantity);
+        if (onPurchaseSuccess) {
+          onPurchaseSuccess(updatedVehicle);
+        }
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || "Purchase failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg hover:border-slate-700 transition-all group flex flex-col">
@@ -69,11 +101,28 @@ export default function VehicleCard({ vehicle }) {
           </h3>
         </div>
 
-        <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
-          <span className="text-xs text-slate-400">Price</span>
-          <span className="text-2xl font-extrabold text-white">
-            ${price?.toLocaleString()}
-          </span>
+        {error && (
+          <p className="text-xs text-red-400 bg-red-500/10 p-2 rounded border border-red-500/20">
+            {error}
+          </p>
+        )}
+
+        <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-4">
+          <div>
+            <span className="block text-xs text-slate-400">Price</span>
+            <span className="text-xl font-extrabold text-white">
+              ${price?.toLocaleString()}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handlePurchase}
+            disabled={isOutOfStock || loading}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {loading ? "Purchasing..." : "Purchase"}
+          </button>
         </div>
       </div>
     </div>
