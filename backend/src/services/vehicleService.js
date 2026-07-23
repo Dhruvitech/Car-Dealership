@@ -1,22 +1,46 @@
 const Vehicle = require("../models/Vehicle");
 
+// ── Private Helpers ────────────────────────────────────────────────────────────
+
+/**
+ * Creates and throws an error with an HTTP status code attached.
+ */
+function throwError(message, statusCode) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  throw error;
+}
+
+// ── Service Class ──────────────────────────────────────────────────────────────
+
 class VehicleService {
+  /**
+   * Creates a new vehicle record in the database.
+   */
   async createVehicle(vehicleData, userId) {
     const { make, model, category, price, quantity, color, images } = vehicleData;
 
+    // Validate presence of required fields
     if (!make || !model || !category || price === undefined || !color) {
-      const error = new Error("Missing required vehicle fields");
-      error.statusCode = 400;
-      throw error;
+      throwError("Missing required vehicle fields", 400);
+    }
+
+    // Validate numerical boundaries
+    if (typeof price !== "number" || price < 0) {
+      throwError("Price must be a non-negative number", 400);
+    }
+
+    if (quantity !== undefined && (typeof quantity !== "number" || quantity < 0)) {
+      throwError("Quantity must be a non-negative number", 400);
     }
 
     const vehicle = await Vehicle.create({
-      make,
-      model,
-      category,
+      make: make.trim(),
+      model: model.trim(),
+      category: category.trim(),
       price,
       quantity: quantity !== undefined ? quantity : 0,
-      color,
+      color: color.trim(),
       images: images || [],
       createdBy: userId
     });
@@ -24,30 +48,37 @@ class VehicleService {
     return vehicle;
   }
 
+  /**
+   * Fetches all vehicle records.
+   */
   async getAllVehicles() {
-    const vehicles = await Vehicle.find({});
-    return vehicles;
+    return await Vehicle.find({});
   }
 
+  /**
+   * Updates an existing vehicle by ID.
+   */
   async updateVehicle(id, updateData) {
-    const vehicle = await Vehicle.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
-    
+    const vehicle = await Vehicle.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true
+    });
+
     if (!vehicle) {
-      const error = new Error("Vehicle not found");
-      error.statusCode = 404;
-      throw error;
+      throwError("Vehicle not found", 404);
     }
 
     return vehicle;
   }
 
+  /**
+   * Deletes a vehicle by ID.
+   */
   async deleteVehicle(id) {
     const vehicle = await Vehicle.findByIdAndDelete(id);
 
     if (!vehicle) {
-      const error = new Error("Vehicle not found");
-      error.statusCode = 404;
-      throw error;
+      throwError("Vehicle not found", 404);
     }
 
     return vehicle;

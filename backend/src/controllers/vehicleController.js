@@ -1,5 +1,17 @@
 const vehicleService = require("../services/vehicleService");
 
+// ── Private Helper ─────────────────────────────────────────────────────────────
+
+/**
+ * Handles controller error responses consistently.
+ */
+function handleError(res, error) {
+  const statusCode = error.statusCode || 500;
+  return res.status(statusCode).json({ error: error.message });
+}
+
+// ── Route Handlers ─────────────────────────────────────────────────────────────
+
 exports.createVehicle = async (req, res) => {
   try {
     const vehicle = await vehicleService.createVehicle(req.body, req.user.id);
@@ -8,8 +20,7 @@ exports.createVehicle = async (req, res) => {
       vehicle
     });
   } catch (error) {
-    const statusCode = error.statusCode || 500;
-    return res.status(statusCode).json({ error: error.message });
+    return handleError(res, error);
   }
 };
 
@@ -18,8 +29,7 @@ exports.getAllVehicles = async (req, res) => {
     const vehicles = await vehicleService.getAllVehicles();
     return res.status(200).json({ vehicles });
   } catch (error) {
-    const statusCode = error.statusCode || 500;
-    return res.status(statusCode).json({ error: error.message });
+    return handleError(res, error);
   }
 };
 
@@ -31,8 +41,7 @@ exports.updateVehicle = async (req, res) => {
       vehicle
     });
   } catch (error) {
-    const statusCode = error.statusCode || 500;
-    return res.status(statusCode).json({ error: error.message });
+    return handleError(res, error);
   }
 };
 
@@ -43,7 +52,6 @@ exports.deleteVehicle = async (req, res) => {
       message: "Vehicle deleted successfully"
     });
   } catch (error) {
-    const statusCode = error.statusCode || 500;
-    return res.status(statusCode).json({ error: error.message });
+    return handleError(res, error);
   }
 };
