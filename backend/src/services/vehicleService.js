@@ -116,6 +116,26 @@ class VehicleService {
     const query = buildSearchQuery(filters);
     return await Vehicle.find(query);
   }
+
+  /**
+   * Purchases a vehicle by decrementing its stock quantity.
+   */
+  async purchaseVehicle(id) {
+    const vehicle = await Vehicle.findById(id);
+
+    if (!vehicle) {
+      throwError("Vehicle not found", 404);
+    }
+
+    if (vehicle.quantity <= 0) {
+      throwError("Vehicle is out of stock", 400);
+    }
+
+    vehicle.quantity -= 1;
+    await vehicle.save();
+
+    return vehicle;
+  }
 }
 
 module.exports = new VehicleService();

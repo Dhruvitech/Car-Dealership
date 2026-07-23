@@ -12,5 +12,6 @@ router.get("/", vehicleController.getAllVehicles);
 router.get("/search", vehicleController.searchVehicles);
 router.put("/:id", vehicleController.updateVehicle);
 router.delete("/:id", adminMiddleware, vehicleController.deleteVehicle);
+router.post("/:id/purchase", vehicleController.purchaseVehicle);
 
 module.exports = router;

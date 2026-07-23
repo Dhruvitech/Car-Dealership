@@ -65,3 +65,16 @@ exports.searchVehicles = async (req, res) => {
   }
 };
 
+exports.purchaseVehicle = async (req, res) => {
+  try {
+    const vehicle = await vehicleService.purchaseVehicle(req.params.id);
+    return res.status(200).json({
+      message: "Vehicle purchased successfully",
+      vehicle
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
+
