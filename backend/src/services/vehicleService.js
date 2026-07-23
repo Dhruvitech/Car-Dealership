@@ -11,6 +11,31 @@ function throwError(message, statusCode) {
   throw error;
 }
 
+/**
+ * Builds a dynamic MongoDB query object from search query parameters.
+ */
+function buildSearchQuery(filters = {}) {
+  const query = {};
+
+  const stringFields = ["make", "model", "category"];
+  stringFields.forEach((field) => {
+    if (filters[field] && typeof filters[field] === "string" && filters[field].trim()) {
+      query[field] = { $regex: filters[field].trim(), $options: "i" };
+    }
+  });
+
+  const minPrice = parseFloat(filters.minPrice);
+  const maxPrice = parseFloat(filters.maxPrice);
+
+  if (!isNaN(minPrice) || !isNaN(maxPrice)) {
+    query.price = {};
+    if (!isNaN(minPrice)) query.price.$gte = minPrice;
+    if (!isNaN(maxPrice)) query.price.$lte = maxPrice;
+  }
+
+  return query;
+}
+
 // ── Service Class ──────────────────────────────────────────────────────────────
 
 class VehicleService {
@@ -85,31 +110,10 @@ class VehicleService {
   }
 
   /**
-   * Searches vehicles by make, model, category, and price range.
+   * Searches vehicles by make, model, category, and price range using query filters.
    */
   async searchVehicles(filters = {}) {
-    const query = {};
-
-    if (filters.make) {
-      query.make = { $regex: filters.make, $options: "i" };
-    }
-    if (filters.model) {
-      query.model = { $regex: filters.model, $options: "i" };
-    }
-    if (filters.category) {
-      query.category = { $regex: filters.category, $options: "i" };
-    }
-
-    if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
-      query.price = {};
-      if (filters.minPrice !== undefined) {
-        query.price.$gte = Number(filters.minPrice);
-      }
-      if (filters.maxPrice !== undefined) {
-        query.price.$lte = Number(filters.maxPrice);
-      }
-    }
-
+    const query = buildSearchQuery(filters);
     return await Vehicle.find(query);
   }
 }
