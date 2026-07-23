@@ -88,6 +88,3 @@ exports.restockVehicle = async (req, res) => {
     return handleError(res, error);
   }
 };
-
-
-

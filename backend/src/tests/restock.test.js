@@ -1,11 +1,9 @@
 /**
- * STAGE 1 — FAILING TESTS ONLY
- * Restock Vehicle Endpoint (POST /api/vehicles/:id/restock)
+ * Integration tests — Vehicle Restock Endpoint
+ * POST /api/vehicles/:id/restock  (admin only)
  *
- * WHY EVERY TEST FAILS RIGHT NOW:
- *   1. vehicleRoutes.js has no POST /:id/restock route defined
- *   2. vehicleController.js has no restockVehicle handler
- *   3. vehicleService.js has no restockVehicle method
+ * Strategy: mock Vehicle.findById with a factory-built object that carries
+ * a jest.fn() save(), so quantity mutation is directly observable.
  */
 
 const request = require("supertest");
