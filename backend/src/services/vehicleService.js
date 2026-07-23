@@ -12,6 +12,16 @@ function throwError(message, statusCode) {
 }
 
 /**
+ * Finds a vehicle by ID and throws a 404 if it does not exist.
+ * Removes the repeated findById + null-check pattern from service methods.
+ */
+async function findVehicleOrFail(id) {
+  const vehicle = await Vehicle.findById(id);
+  if (!vehicle) throwError("Vehicle not found", 404);
+  return vehicle;
+}
+
+/**
  * Builds a dynamic MongoDB query object from search query parameters.
  */
 function buildSearchQuery(filters = {}) {
@@ -89,9 +99,7 @@ class VehicleService {
       runValidators: true
     });
 
-    if (!vehicle) {
-      throwError("Vehicle not found", 404);
-    }
+    if (!vehicle) throwError("Vehicle not found", 404);
 
     return vehicle;
   }
@@ -102,9 +110,7 @@ class VehicleService {
   async deleteVehicle(id) {
     const vehicle = await Vehicle.findByIdAndDelete(id);
 
-    if (!vehicle) {
-      throwError("Vehicle not found", 404);
-    }
+    if (!vehicle) throwError("Vehicle not found", 404);
 
     return vehicle;
   }
@@ -119,13 +125,10 @@ class VehicleService {
 
   /**
    * Purchases a vehicle by decrementing its stock quantity.
+   * Uses findVehicleOrFail to handle the lookup and 404 check in one place.
    */
   async purchaseVehicle(id) {
-    const vehicle = await Vehicle.findById(id);
-
-    if (!vehicle) {
-      throwError("Vehicle not found", 404);
-    }
+    const vehicle = await findVehicleOrFail(id);
 
     if (vehicle.quantity <= 0) {
       throwError("Vehicle is out of stock", 400);

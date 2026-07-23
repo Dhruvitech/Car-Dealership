@@ -1,17 +1,15 @@
 /**
- * STAGE 1 — FAILING TESTS ONLY
- * Purchase Vehicle Endpoint (POST /api/vehicles/:id/purchase)
+ * Integration tests — Vehicle Purchase Endpoint
+ * POST /api/vehicles/:id/purchase
  *
- * WHY EVERY TEST FAILS RIGHT NOW:
- *   1. vehicleRoutes.js has no POST /:id/purchase route defined
- *   2. vehicleController.js has no purchaseVehicle handler
- *   3. vehicleService.js has no purchaseVehicle method
+ * Strategy: mock Vehicle.findById with controlled objects that include
+ * a jest.fn() save() method, so the service layer can be tested
+ * without a live MongoDB connection.
  */
 
 const request = require("supertest");
 const jwt = require("jsonwebtoken");
 
-// Mock Vehicle model before requiring app
 jest.mock("../models/Vehicle", () => ({
   findById: jest.fn()
 }));
@@ -21,6 +19,20 @@ const Vehicle = require("../models/Vehicle");
 
 const JWT_SECRET = process.env.JWT_SECRET || "mySuperSecretKey123";
 const userToken = jwt.sign({ id: "user_id_123", role: "user" }, JWT_SECRET, { expiresIn: "1d" });
+
+// ── Vehicle Factories ──────────────────────────────────────────────────────────
+
+const makeVehicle = (quantity) => ({
+  _id: "veh_123",
+  make: "Toyota",
+  model: "Camry",
+  quantity,
+  save: jest.fn().mockImplementation(function () {
+    return Promise.resolve(this);
+  })
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 describe("POST /api/vehicles/:id/purchase", () => {
   beforeEach(() => {
@@ -45,19 +57,12 @@ describe("POST /api/vehicles/:id/purchase", () => {
     expect(res.body).toHaveProperty("error", "Vehicle not found");
   });
 
-  it("should return 400 if vehicle quantity is zero (out of stock)", async () => {
-    const outOfStockVehicle = {
-      _id: "veh_out",
-      make: "Toyota",
-      model: "Corolla",
-      quantity: 0,
-      save: jest.fn()
-    };
-
+  it("should return 400 and not call save() if vehicle is out of stock", async () => {
+    const outOfStockVehicle = makeVehicle(0);
     Vehicle.findById.mockResolvedValue(outOfStockVehicle);
 
     const res = await request(app)
-      .post("/api/vehicles/veh_out/purchase")
+      .post("/api/vehicles/veh_123/purchase")
       .set("Authorization", `Bearer ${userToken}`);
 
     expect(res.statusCode).toBe(400);
@@ -66,16 +71,7 @@ describe("POST /api/vehicles/:id/purchase", () => {
   });
 
   it("should decrease quantity by 1, save, and return updated vehicle on successful purchase", async () => {
-    const mockVehicle = {
-      _id: "veh_123",
-      make: "Toyota",
-      model: "Camry",
-      quantity: 3,
-      save: jest.fn().mockImplementation(function () {
-        return Promise.resolve(this);
-      })
-    };
-
+    const mockVehicle = makeVehicle(3);
     Vehicle.findById.mockResolvedValue(mockVehicle);
 
     const res = await request(app)
