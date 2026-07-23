@@ -281,7 +281,7 @@ export default function AdminDashboard() {
                           {v.color}
                         </span>
                       </td>
-                      <td className="p-4 font-extrabold text-slate-900">${v.price?.toLocaleString()}</td>
+                      <td className="p-4 font-extrabold text-slate-900">₹{v.price?.toLocaleString()}</td>
                       <td className="p-4">
                         <span
                           className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${

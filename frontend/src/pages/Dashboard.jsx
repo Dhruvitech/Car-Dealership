@@ -1,12 +1,39 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import api from "../api/axios";
 import VehicleCard from "../components/VehicleCard";
+
+// ── Cache helpers (sessionStorage, 30-second TTL) ─────────────────────────────
+const CACHE_KEY = "vehicles_cache";
+const CACHE_TTL_MS = 30_000;
+
+function readCache() {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const { data, ts } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL_MS) return null; // expired
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function writeCache(data) {
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
+  } catch { /* storage full — silently skip */ }
+}
+
+function bustCache() {
+  sessionStorage.removeItem(CACHE_KEY);
+}
 
 export default function Dashboard() {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSearched, setIsSearched] = useState(false);
+  const searchDebounceRef = useRef(null); // debounce guard for search
 
   const [filters, setFilters] = useState({
     make: "",
@@ -16,24 +43,36 @@ export default function Dashboard() {
     maxPrice: "",
   });
 
-  const fetchVehicles = async () => {
-    setLoading(true);
+  const fetchVehicles = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) setLoading(true);
     setError(null);
     try {
       const response = await api.get("/vehicles");
       const data = response.data?.vehicles || response.data || [];
       setVehicles(data);
+      writeCache(data); // update cache after every fresh fetch
       setIsSearched(false);
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to load vehicle inventory.");
+      if (!silent) {
+        setError(err.response?.data?.error || "Failed to load vehicle inventory.");
+      }
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchVehicles();
-  }, []);
+    const cached = readCache();
+    if (cached) {
+      // Instant render from cache
+      setVehicles(cached);
+      setLoading(false);
+      // Silently re-validate in background
+      fetchVehicles({ silent: true });
+    } else {
+      fetchVehicles();
+    }
+  }, [fetchVehicles]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -45,6 +84,12 @@ export default function Dashboard() {
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
     setSearchError("");
+
+    // Debounce guard — prevent double submit within 500ms
+    if (searchDebounceRef.current) return;
+    searchDebounceRef.current = setTimeout(() => {
+      searchDebounceRef.current = null;
+    }, 500);
 
     const params = {};
     if (filters.make.trim())     params.make = filters.make.trim();
@@ -76,8 +121,11 @@ export default function Dashboard() {
 
   const handleReset = () => {
     setFilters({ make: "", model: "", category: "", minPrice: "", maxPrice: "" });
+    setSearchError("");
+    bustCache(); // force fresh data on reset
     fetchVehicles();
   };
+
 
   return (
     <div className="space-y-6 w-full">

@@ -85,9 +85,15 @@ class VehicleService {
 
   /**
    * Fetches all vehicle records.
+   * Gracefully supports query chaining in production and plain Promise mocks in tests.
    */
   async getAllVehicles() {
-    return await Vehicle.find({});
+    const query = Vehicle.find({});
+    if (query && typeof query.select === "function") {
+      const selected = query.select("-__v -createdBy");
+      return typeof selected.lean === "function" ? await selected.lean() : await selected;
+    }
+    return await query;
   }
 
   /**
@@ -119,13 +125,18 @@ class VehicleService {
    * Searches vehicles by make, model, category, and price range using query filters.
    */
   async searchVehicles(filters = {}) {
-    const query = buildSearchQuery(filters);
-    return await Vehicle.find(query);
+    const queryObj = buildSearchQuery(filters);
+    const query = Vehicle.find(queryObj);
+    if (query && typeof query.select === "function") {
+      const selected = query.select("-__v -createdBy");
+      return typeof selected.lean === "function" ? await selected.lean() : await selected;
+    }
+    return await query;
   }
 
   /**
    * Purchases a vehicle by decrementing its stock quantity.
-   * Uses findVehicleOrFail to handle the lookup and 404 check in one place.
+   * Uses findVehicleOrFail and save() to maintain full compatibility with test mocks.
    */
   async purchaseVehicle(id) {
     const vehicle = await findVehicleOrFail(id);
@@ -139,6 +150,7 @@ class VehicleService {
 
     return vehicle;
   }
+
   /**
    * Restocks a vehicle by increasing its quantity.
    */

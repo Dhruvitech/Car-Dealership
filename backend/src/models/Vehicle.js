@@ -50,4 +50,12 @@ const vehicleSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Vehicle", vehicleSchema);
+// ── Performance Indexes ────────────────────────────────────────────────────────
+// Compound index for common search filters (make + model + category)
+vehicleSchema.index({ make: 1, model: 1, category: 1 });
+// Index for price-range queries
+vehicleSchema.index({ price: 1 });
+// Text index for case-insensitive string searches
+vehicleSchema.index({ make: "text", model: "text", category: "text" });
+
+module.exports = mongoose.model("Vehicle", vehicleSchema);

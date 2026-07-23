@@ -34,7 +34,8 @@ const mockVehicles = [
 
 describe("Dashboard Component", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
+    sessionStorage.clear(); // prevent cache from leaking between tests
   });
 
   it("should display loading skeleton while fetching vehicles", () => {
