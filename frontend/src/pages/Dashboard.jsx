@@ -6,15 +6,24 @@ export default function Dashboard() {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSearched, setIsSearched] = useState(false);
+
+  const [filters, setFilters] = useState({
+    make: "",
+    model: "",
+    category: "",
+    minPrice: "",
+    maxPrice: "",
+  });
 
   const fetchVehicles = async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await api.get("/vehicles");
-      // Response expected format: { vehicles: [...] } or [...]
       const data = response.data?.vehicles || response.data || [];
       setVehicles(data);
+      setIsSearched(false);
     } catch (err) {
       setError(err.response?.data?.error || "Failed to load vehicle inventory.");
     } finally {
@@ -26,6 +35,41 @@ export default function Dashboard() {
     fetchVehicles();
   }, []);
 
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSearchSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    // Build query parameters object
+    const params = {};
+    if (filters.make.trim())     params.make = filters.make.trim();
+    if (filters.model.trim())    params.model = filters.model.trim();
+    if (filters.category.trim()) params.category = filters.category.trim();
+    if (filters.minPrice.trim()) params.minPrice = filters.minPrice.trim();
+    if (filters.maxPrice.trim()) params.maxPrice = filters.maxPrice.trim();
+
+    try {
+      const response = await api.get("/vehicles/search", { params });
+      const data = response.data?.vehicles || response.data || [];
+      setVehicles(data);
+      setIsSearched(true);
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to perform vehicle search.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = () => {
+    setFilters({ make: "", model: "", category: "", minPrice: "", maxPrice: "" });
+    fetchVehicles();
+  };
+
   return (
     <div className="space-y-8">
       {/* Header Banner */}
@@ -33,15 +77,99 @@ export default function Dashboard() {
         <div>
           <h1 className="text-3xl font-bold text-white">Vehicle Inventory</h1>
           <p className="text-sm text-slate-400 mt-1">
-            Browse current available dealership vehicles
+            Browse and filter current dealership listings
           </p>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-medium">
-            {loading ? "Updating..." : `${vehicles.length} Vehicles Available`}
+            {loading ? "Updating..." : `${vehicles.length} Vehicles`}
           </span>
         </div>
       </div>
+
+      {/* Search & Filter Bar */}
+      <form
+        onSubmit={handleSearchSubmit}
+        className="bg-slate-900 border border-slate-800 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end"
+      >
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 mb-1">Make</label>
+          <input
+            type="text"
+            name="make"
+            value={filters.make}
+            onChange={handleFilterChange}
+            placeholder="Search Make"
+            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 mb-1">Model</label>
+          <input
+            type="text"
+            name="model"
+            value={filters.model}
+            onChange={handleFilterChange}
+            placeholder="Search Model"
+            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 mb-1">Category</label>
+          <input
+            type="text"
+            name="category"
+            value={filters.category}
+            onChange={handleFilterChange}
+            placeholder="Category"
+            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 mb-1">Min Price</label>
+          <input
+            type="number"
+            name="minPrice"
+            value={filters.minPrice}
+            onChange={handleFilterChange}
+            placeholder="Min Price"
+            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 mb-1">Max Price</label>
+          <input
+            type="number"
+            name="maxPrice"
+            value={filters.maxPrice}
+            onChange={handleFilterChange}
+            placeholder="Max Price"
+            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm rounded-lg transition"
+          >
+            Search
+          </button>
+          {isSearched && (
+            <button
+              type="button"
+              onClick={handleReset}
+              className="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm rounded-lg transition"
+            >
+              Reset
+            </button>
+          )}
+        </div>
+      </form>
 
       {/* Loading State */}
       {loading && (
@@ -92,13 +220,17 @@ export default function Dashboard() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={1.5}
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
           </div>
-          <h3 className="text-lg font-bold text-white">No Vehicles Found</h3>
+          <h3 className="text-lg font-bold text-white">
+            {isSearched ? "No Vehicles Match Your Search" : "No Vehicles Found"}
+          </h3>
           <p className="text-sm text-slate-400">
-            There are currently no vehicles available in the inventory.
+            {isSearched
+              ? "No vehicles match your search criteria. Try adjusting your filters."
+              : "There are currently no vehicles available in the inventory."}
           </p>
         </div>
       )}

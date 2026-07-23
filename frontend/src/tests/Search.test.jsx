@@ -1,11 +1,5 @@
 /**
- * STAGE 1 — FAILING TESTS ONLY
- * Vehicle Search Feature
- *
- * WHY EVERY TEST FAILS RIGHT NOW:
- *   1. Search filter form controls (make, model, category, minPrice, maxPrice) are not rendered on Dashboard
- *   2. Submit trigger and query parameter construction for GET /api/vehicles/search are missing
- *   3. Search results handling state is not connected to the vehicle grid
+ * STAGE 1 — Vehicle Search Feature Tests
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -36,7 +30,12 @@ const mockSearchResults = [
 describe("Vehicle Search Feature", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    api.get.mockResolvedValue({ data: { vehicles: [] } });
+    api.get.mockImplementation((url) => {
+      if (url === "/vehicles") {
+        return Promise.resolve({ data: { vehicles: [] } });
+      }
+      return Promise.resolve({ data: { vehicles: [] } });
+    });
   });
 
   it("should render all search input fields (Make, Model, Category, Min Price, Max Price) and Search button", () => {
@@ -53,7 +52,12 @@ describe("Vehicle Search Feature", () => {
   });
 
   it("should call GET /api/vehicles/search with query parameters on search submit", async () => {
-    api.get.mockResolvedValueOnce({ data: { vehicles: mockSearchResults } });
+    api.get.mockImplementation((url) => {
+      if (url === "/vehicles/search") {
+        return Promise.resolve({ data: { vehicles: mockSearchResults } });
+      }
+      return Promise.resolve({ data: { vehicles: [] } });
+    });
 
     render(<Dashboard />);
 
@@ -81,7 +85,12 @@ describe("Vehicle Search Feature", () => {
   });
 
   it("should display search results returned from GET /api/vehicles/search", async () => {
-    api.get.mockResolvedValueOnce({ data: { vehicles: mockSearchResults } });
+    api.get.mockImplementation((url) => {
+      if (url === "/vehicles/search") {
+        return Promise.resolve({ data: { vehicles: mockSearchResults } });
+      }
+      return Promise.resolve({ data: { vehicles: [] } });
+    });
 
     render(<Dashboard />);
 
@@ -96,7 +105,12 @@ describe("Vehicle Search Feature", () => {
   });
 
   it("should display empty state message when search returns no matching vehicles", async () => {
-    api.get.mockResolvedValueOnce({ data: { vehicles: [] } });
+    api.get.mockImplementation((url) => {
+      if (url === "/vehicles/search") {
+        return Promise.resolve({ data: { vehicles: [] } });
+      }
+      return Promise.resolve({ data: { vehicles: [] } });
+    });
 
     render(<Dashboard />);
 
@@ -106,6 +120,8 @@ describe("Vehicle Search Feature", () => {
     const searchBtn = screen.getByRole("button", { name: /search|filter/i });
     await user.click(searchBtn);
 
-    expect(await screen.findByText(/no vehicles match your search/i)).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: /no vehicles match your search/i })
+    ).toBeInTheDocument();
   });
 });
