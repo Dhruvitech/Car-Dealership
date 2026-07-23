@@ -3,16 +3,62 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
+// ── Helpers & Constants ────────────────────────────────────────────────────────
+
+const INITIAL_FORM_STATE = {
+  name: "",
+  email: "",
+  password: "",
+};
+
+/**
+ * Validates registration form inputs.
+ * Returns an object containing error messages for invalid fields.
+ */
+function validateRegisterForm(formData) {
+  const errors = {};
+  if (!formData.name.trim())     errors.name = "Name is required";
+  if (!formData.email.trim())    errors.email = "Email is required";
+  if (!formData.password.trim()) errors.password = "Password is required";
+  return errors;
+}
+
+/**
+ * Extracts a displayable error message from an API catch error.
+ */
+function extractErrorMessage(err) {
+  return err.response?.data?.error || "Registration failed. Please try again.";
+}
+
+// ── Reusable Input Component ───────────────────────────────────────────────────
+
+function FormField({ id, name, label, type = "text", value, onChange, placeholder, error }) {
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+        {label}
+      </label>
+      <input
+        id={id}
+        name={name}
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+      />
+      {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+    </div>
+  );
+}
+
+// ── Main Register Page Component ───────────────────────────────────────────────
+
 export default function Register() {
   const navigate = useNavigate();
-  const { login } = useAuth() || {};
+  const auth = useAuth();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState(INITIAL_FORM_STATE);
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -25,26 +71,12 @@ export default function Register() {
     setApiError("");
   };
 
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    }
-    if (!formData.password.trim()) {
-      newErrors.password = "Password is required";
-    }
-    return newErrors;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError("");
     setSuccessMessage("");
 
-    const validationErrors = validate();
+    const validationErrors = validateRegisterForm(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -54,17 +86,16 @@ export default function Register() {
 
     try {
       const response = await api.post("/auth/register", formData);
-      const data = response.data;
+      const { message, token, user } = response.data || {};
 
-      setSuccessMessage(data.message || "Registration successful!");
+      setSuccessMessage(message || "Registration successful!");
 
-      if (data.token && data.user && login) {
-        login(data.token, data.user);
+      if (token && user && auth?.login) {
+        auth.login(token, user);
         navigate("/dashboard");
       }
     } catch (err) {
-      const msg = err.response?.data?.error || "Registration failed. Please try again.";
-      setApiError(msg);
+      setApiError(extractErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -92,59 +123,37 @@ export default function Register() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-        <div>
-          <label htmlFor="name" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-            Name
-          </label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="John Doe"
-            className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500"
-          />
-          {errors.name && (
-            <p className="text-xs text-red-400 mt-1">{errors.name}</p>
-          )}
-        </div>
+        <FormField
+          id="name"
+          name="name"
+          label="Name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="John Doe"
+          error={errors.name}
+        />
 
-        <div>
-          <label htmlFor="email" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="user@dealership.com"
-            className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500"
-          />
-          {errors.email && (
-            <p className="text-xs text-red-400 mt-1">{errors.email}</p>
-          )}
-        </div>
+        <FormField
+          id="email"
+          name="email"
+          label="Email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="user@dealership.com"
+          error={errors.email}
+        />
 
-        <div>
-          <label htmlFor="password" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="••••••••"
-            className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500"
-          />
-          {errors.password && (
-            <p className="text-xs text-red-400 mt-1">{errors.password}</p>
-          )}
-        </div>
+        <FormField
+          id="password"
+          name="password"
+          label="Password"
+          type="password"
+          value={formData.password}
+          onChange={handleChange}
+          placeholder="••••••••"
+          error={errors.password}
+        />
 
         <button
           type="submit"
