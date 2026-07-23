@@ -7,6 +7,7 @@ const INITIAL_FORM_STATE = {
   name: "",
   email: "",
   password: "",
+  role: "user",
 };
 
 function validateRegisterForm(formData) {
@@ -148,12 +149,29 @@ export default function Register() {
           error={errors.password}
         />
 
+        {/* Account Role Selector */}
+        <div>
+          <label htmlFor="role" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+            Account Type
+          </label>
+          <select
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all font-medium text-sm"
+          >
+            <option value="user">Customer (Standard User)</option>
+            <option value="admin">Dealership Manager (Admin)</option>
+          </select>
+        </div>
+
         <button
           type="submit"
           disabled={loading}
           className="w-full py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-xl text-center transition-all shadow-md shadow-blue-600/20 disabled:opacity-50"
         >
-          {loading ? "Registering..." : "Register"}
+          {loading ? "Registering..." : "Register Account"}
         </button>
       </form>
 
