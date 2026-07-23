@@ -15,10 +15,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-3">
             <Link to="/" className="flex items-center space-x-2">
               <span className="text-2xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
-                AutoMax
-              </span>
-              <span className="text-xs px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">
-                Dealership
+                Car-Dealership
               </span>
             </Link>
           </div>
