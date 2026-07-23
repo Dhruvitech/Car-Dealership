@@ -45,7 +45,6 @@ export default function Dashboard() {
     setLoading(true);
     setError(null);
 
-    // Build query parameters object
     const params = {};
     if (filters.make.trim())     params.make = filters.make.trim();
     if (filters.model.trim())    params.model = filters.model.trim();
@@ -73,15 +72,18 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">Vehicle Inventory</h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Vehicle Inventory</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Browse and filter current dealership listings
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-medium">
+          <span
+            aria-live="polite"
+            className="text-xs px-3.5 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-semibold shadow-sm"
+          >
             {loading ? "Updating..." : `${vehicles.length} Vehicles`}
           </span>
         </div>
@@ -90,72 +92,79 @@ export default function Dashboard() {
       {/* Search & Filter Bar */}
       <form
         onSubmit={handleSearchSubmit}
-        className="bg-slate-900 border border-slate-800 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end"
+        aria-label="Search Vehicles"
+        className="bg-white border border-slate-200 rounded-2xl p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end shadow-sm"
       >
         <div>
-          <label className="block text-xs font-semibold text-slate-400 mb-1">Make</label>
+          <label htmlFor="search-make" className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Make</label>
           <input
+            id="search-make"
             type="text"
             name="make"
             value={filters.make}
             onChange={handleFilterChange}
             placeholder="Search Make"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+            className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-400 mb-1">Model</label>
+          <label htmlFor="search-model" className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Model</label>
           <input
+            id="search-model"
             type="text"
             name="model"
             value={filters.model}
             onChange={handleFilterChange}
             placeholder="Search Model"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+            className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-400 mb-1">Category</label>
+          <label htmlFor="search-category" className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Category</label>
           <input
+            id="search-category"
             type="text"
             name="category"
             value={filters.category}
             onChange={handleFilterChange}
             placeholder="Category"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+            className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-400 mb-1">Min Price</label>
+          <label htmlFor="search-min-price" className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Min Price</label>
           <input
+            id="search-min-price"
             type="number"
             name="minPrice"
             value={filters.minPrice}
             onChange={handleFilterChange}
             placeholder="Min Price"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+            className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-400 mb-1">Max Price</label>
+          <label htmlFor="search-max-price" className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Max Price</label>
           <input
+            id="search-max-price"
             type="number"
             name="maxPrice"
             value={filters.maxPrice}
             onChange={handleFilterChange}
             placeholder="Max Price"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+            className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
           />
         </div>
 
         <div className="flex gap-2">
           <button
             type="submit"
-            className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm rounded-lg transition"
+            aria-label="Submit vehicle search"
+            className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm rounded-xl transition-all shadow-md shadow-blue-600/10"
           >
             Search
           </button>
@@ -163,7 +172,8 @@ export default function Dashboard() {
             <button
               type="button"
               onClick={handleReset}
-              className="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm rounded-lg transition"
+              aria-label="Reset search filters"
+              className="py-2 px-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-xl transition-colors border border-slate-200"
             >
               Reset
             </button>
@@ -175,16 +185,18 @@ export default function Dashboard() {
       {loading && (
         <div
           data-testid="loading-state"
+          aria-label="Loading vehicle inventory"
+          aria-live="polite"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse"
         >
           {[1, 2, 3, 4, 5, 6].map((idx) => (
             <div
               key={idx}
-              className="bg-slate-900 border border-slate-800 rounded-xl h-80 flex flex-col p-5 space-y-4"
+              className="bg-white border border-slate-200 rounded-2xl h-80 flex flex-col p-5 space-y-4 shadow-sm"
             >
-              <div className="bg-slate-800 h-40 rounded-lg w-full" />
-              <div className="bg-slate-800 h-6 rounded w-3/4" />
-              <div className="bg-slate-800 h-4 rounded w-1/2" />
+              <div className="bg-slate-200 h-40 rounded-xl w-full" />
+              <div className="bg-slate-200 h-6 rounded-lg w-3/4" />
+              <div className="bg-slate-200 h-4 rounded-lg w-1/2" />
             </div>
           ))}
         </div>
@@ -192,11 +204,11 @@ export default function Dashboard() {
 
       {/* Error State */}
       {!loading && error && (
-        <div className="p-6 bg-red-500/10 border border-red-500/30 rounded-xl text-center space-y-3">
-          <p className="text-red-400 font-medium">{error}</p>
+        <div role="alert" className="p-6 bg-red-50 border border-red-200 rounded-2xl text-center space-y-3 shadow-sm">
+          <p className="text-red-700 font-medium">{error}</p>
           <button
             onClick={fetchVehicles}
-            className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-lg transition"
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-xl transition shadow-sm"
           >
             Retry Loading
           </button>
@@ -207,14 +219,15 @@ export default function Dashboard() {
       {!loading && !error && vehicles.length === 0 && (
         <div
           data-testid="empty-state"
-          className="bg-slate-900 border border-slate-800 rounded-xl p-12 text-center max-w-md mx-auto space-y-3"
+          className="bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-md mx-auto space-y-3 shadow-sm"
         >
-          <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto text-slate-400">
+          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
             <svg
               className="w-8 h-8"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -224,10 +237,10 @@ export default function Dashboard() {
               />
             </svg>
           </div>
-          <h3 className="text-lg font-bold text-white">
+          <h3 className="text-lg font-bold text-slate-900">
             {isSearched ? "No Vehicles Match Your Search" : "No Vehicles Found"}
           </h3>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-500">
             {isSearched
               ? "No vehicles match your search criteria. Try adjusting your filters."
               : "There are currently no vehicles available in the inventory."}

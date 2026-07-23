@@ -75,110 +75,122 @@ export default function VehicleForm({ initialData = null, onSubmit, onCancel, lo
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="make" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-            Make
+          <label htmlFor="make" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            Make <span className="text-red-500">*</span>
           </label>
           <input
             id="make"
             name="make"
             type="text"
+            aria-required="true"
+            aria-invalid={Boolean(errors.make)}
             value={formData.make}
             onChange={handleChange}
             placeholder="e.g. Toyota"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
           />
-          {errors.make && <p className="text-xs text-red-400 mt-1">{errors.make}</p>}
+          {errors.make && <p role="alert" className="text-xs text-red-600 mt-1 font-medium">{errors.make}</p>}
         </div>
 
         <div>
-          <label htmlFor="model" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-            Model
+          <label htmlFor="model" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            Model <span className="text-red-500">*</span>
           </label>
           <input
             id="model"
             name="model"
             type="text"
+            aria-required="true"
+            aria-invalid={Boolean(errors.model)}
             value={formData.model}
             onChange={handleChange}
             placeholder="e.g. Camry"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
           />
-          {errors.model && <p className="text-xs text-red-400 mt-1">{errors.model}</p>}
+          {errors.model && <p role="alert" className="text-xs text-red-600 mt-1 font-medium">{errors.model}</p>}
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <label htmlFor="category" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-            Category
+          <label htmlFor="category" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            Category <span className="text-red-500">*</span>
           </label>
           <input
             id="category"
             name="category"
             type="text"
+            aria-required="true"
+            aria-invalid={Boolean(errors.category)}
             value={formData.category}
             onChange={handleChange}
             placeholder="e.g. SUV, Sedan"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
           />
-          {errors.category && <p className="text-xs text-red-400 mt-1">{errors.category}</p>}
+          {errors.category && <p role="alert" className="text-xs text-red-600 mt-1 font-medium">{errors.category}</p>}
         </div>
 
         <div>
-          <label htmlFor="color" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-            Color
+          <label htmlFor="color" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            Color <span className="text-red-500">*</span>
           </label>
           <input
             id="color"
             name="color"
             type="text"
+            aria-required="true"
+            aria-invalid={Boolean(errors.color)}
             value={formData.color}
             onChange={handleChange}
             placeholder="e.g. Red, Black"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
           />
-          {errors.color && <p className="text-xs text-red-400 mt-1">{errors.color}</p>}
+          {errors.color && <p role="alert" className="text-xs text-red-600 mt-1 font-medium">{errors.color}</p>}
         </div>
 
         <div>
-          <label htmlFor="price" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-            Price ($)
+          <label htmlFor="price" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            Price ($) <span className="text-red-500">*</span>
           </label>
           <input
             id="price"
             name="price"
             type="number"
+            aria-required="true"
+            aria-invalid={Boolean(errors.price)}
             value={formData.price}
             onChange={handleChange}
             placeholder="e.g. 25000"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
           />
-          {errors.price && <p className="text-xs text-red-400 mt-1">{errors.price}</p>}
+          {errors.price && <p role="alert" className="text-xs text-red-600 mt-1 font-medium">{errors.price}</p>}
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="quantity" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-            Initial Quantity
+          <label htmlFor="quantity" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            Initial Quantity <span className="text-red-500">*</span>
           </label>
           <input
             id="quantity"
             name="quantity"
             type="number"
+            aria-required="true"
+            aria-invalid={Boolean(errors.quantity)}
             value={formData.quantity}
             onChange={handleChange}
             placeholder="e.g. 5"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
           />
-          {errors.quantity && <p className="text-xs text-red-400 mt-1">{errors.quantity}</p>}
+          {errors.quantity && <p role="alert" className="text-xs text-red-600 mt-1 font-medium">{errors.quantity}</p>}
         </div>
 
         <div>
-          <label htmlFor="images" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+          <label htmlFor="images" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
             Image URLs (comma separated)
           </label>
           <input
@@ -188,17 +200,17 @@ export default function VehicleForm({ initialData = null, onSubmit, onCancel, lo
             value={formData.images}
             onChange={handleChange}
             placeholder="https://example.com/img1.jpg"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
           />
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
+      <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
         {onCancel && (
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-lg transition"
+            className="px-4.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-xl transition"
           >
             Cancel
           </button>
@@ -206,7 +218,7 @@ export default function VehicleForm({ initialData = null, onSubmit, onCancel, lo
         <button
           type="submit"
           disabled={loading}
-          className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition disabled:opacity-50"
+          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold rounded-xl transition shadow-md shadow-blue-600/10 disabled:opacity-50"
         >
           {loading ? "Saving..." : initialData ? "Update Vehicle" : "Add Vehicle"}
         </button>

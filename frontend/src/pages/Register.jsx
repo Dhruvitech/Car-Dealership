@@ -3,18 +3,12 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
-// ── Helpers & Constants ────────────────────────────────────────────────────────
-
 const INITIAL_FORM_STATE = {
   name: "",
   email: "",
   password: "",
 };
 
-/**
- * Validates registration form inputs.
- * Returns an object containing error messages for invalid fields.
- */
 function validateRegisterForm(formData) {
   const errors = {};
   if (!formData.name.trim())     errors.name = "Name is required";
@@ -23,36 +17,31 @@ function validateRegisterForm(formData) {
   return errors;
 }
 
-/**
- * Extracts a displayable error message from an API catch error.
- */
 function extractErrorMessage(err) {
   return err.response?.data?.error || "Registration failed. Please try again.";
 }
 
-// ── Reusable Input Component ───────────────────────────────────────────────────
-
 function FormField({ id, name, label, type = "text", value, onChange, placeholder, error }) {
   return (
     <div>
-      <label htmlFor={id} className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-        {label}
+      <label htmlFor={id} className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+        {label} <span className="text-red-500">*</span>
       </label>
       <input
         id={id}
         name={name}
         type={type}
+        aria-required="true"
+        aria-invalid={Boolean(error)}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
       />
-      {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+      {error && <p role="alert" className="text-xs text-red-600 mt-1 font-medium">{error}</p>}
     </div>
   );
 }
-
-// ── Main Register Page Component ───────────────────────────────────────────────
 
 export default function Register() {
   const navigate = useNavigate();
@@ -92,7 +81,11 @@ export default function Register() {
 
       if (token && user && auth?.login) {
         auth.login(token, user);
-        navigate("/dashboard");
+        if (user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard");
+        }
       }
     } catch (err) {
       setApiError(extractErrorMessage(err));
@@ -102,27 +95,27 @@ export default function Register() {
   };
 
   return (
-    <div className="max-w-md mx-auto my-12 p-8 bg-slate-900 border border-slate-800 rounded-xl shadow-xl">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-        <p className="text-sm text-slate-400">
+    <div className="max-w-md mx-auto my-12 p-8 bg-white border border-slate-200 rounded-2xl shadow-xl space-y-6">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Create Account</h1>
+        <p className="text-sm text-slate-600">
           Register to join the dealership platform
         </p>
       </div>
 
       {apiError && (
-        <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+        <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium">
           {apiError}
         </div>
       )}
 
       {successMessage && (
-        <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 text-sm">
+        <div role="status" aria-live="polite" className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-sm font-medium">
           {successMessage}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate aria-label="Registration Form">
         <FormField
           id="name"
           name="name"
@@ -158,15 +151,15 @@ export default function Register() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg text-center transition disabled:opacity-50"
+          className="w-full py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-xl text-center transition-all shadow-md shadow-blue-600/20 disabled:opacity-50"
         >
           {loading ? "Registering..." : "Register"}
         </button>
       </form>
 
-      <p className="text-xs text-center text-slate-500 mt-6">
+      <p className="text-xs text-center text-slate-500 pt-3 border-t border-slate-100">
         Already have an account?{" "}
-        <Link to="/login" className="text-blue-400 hover:underline">
+        <Link to="/login" className="text-blue-600 hover:text-blue-700 font-semibold hover:underline">
           Sign In
         </Link>
       </p>

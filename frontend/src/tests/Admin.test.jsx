@@ -28,7 +28,7 @@ const mockVehicles = [
 
 describe("Admin Dashboard Component", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     api.get.mockResolvedValue({ data: { vehicles: mockVehicles } });
   });
 
